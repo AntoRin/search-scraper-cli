@@ -1,0 +1,36 @@
+{
+   "name": "search-scraper-cli",
+   "version": "1.0.0",
+   "description": "A recursive scraper for your terminal",
+   "main": "dist/index.js",
+   "bin": {
+      "search": "./bin/cli",
+      "lookup": "./bin/cli"
+   },
+   "scripts": {
+      "build": "rm -r ./dist && tsc",
+      "dev": "rm -r ./dist && tsc -w"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/AntoRin/search-scraper-cli.git"
+   },
+   "keywords": [
+      "scraper"
+   ],
+   "author": "AntoRin",
+   "license": "MIT",
+   "bugs": {
+      "url": "https://github.com/AntoRin/search-scraper-cli/issues"
+   },
+   "homepage": "https://github.com/AntoRin/search-scraper-cli#readme",
+   "dependencies": {
+      "minimist": "^1.2.5",
+      "node-fetch": "^2.6.1"
+   },
+   "devDependencies": {
+      "@types/minimist": "^1.2.1",
+      "@types/node": "^15.12.4",
+      "@types/node-fetch": "^2.5.10"
+   }
+}
