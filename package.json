@@ -8,8 +8,8 @@
       "lookup": "./bin/cli"
    },
    "scripts": {
-      "build": "rm -r ./dist && tsc",
-      "dev": "rm -r ./dist && tsc -w"
+      "build": "rm -rf ./dist && tsc",
+      "dev": "rm -rf ./dist && tsc -w"
    },
    "repository": {
       "type": "git",
@@ -31,6 +31,7 @@
    "devDependencies": {
       "@types/minimist": "^1.2.1",
       "@types/node": "^15.12.4",
-      "@types/node-fetch": "^2.5.10"
+      "@types/node-fetch": "^2.5.10",
+      "typescript": "^4.3.4"
    }
 }

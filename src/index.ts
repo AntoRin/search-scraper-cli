@@ -1,35 +1,50 @@
 import { promisify } from "util";
-import child_process from "child_process";
+import child_process, { ChildProcess } from "child_process";
+import { writeFile } from "fs/promises";
 import minimist from "minimist";
-import { Client } from "./lib/Client";
+import { SearchService } from "./services/SearchService";
 import { IArguments } from "IArguments";
 import { ISearchResult } from "ISearchResult";
+import { rm } from "fs";
 
-const execAsync = promisify(child_process.exec);
+const { spawn } = child_process;
+const rmAsync = promisify(rm);
 
-export async function main() {            
-    const args: minimist.ParsedArgs = minimist<string>(process.argv.slice(2)); 
+export async function main() {
+   const args: minimist.ParsedArgs = minimist<string>(process.argv.slice(2));
 
-    const client: Client = new Client();
-    const commands: IArguments = client.parseArguments(args);
+   const searchClient: SearchService = new SearchService();
+   const commands: IArguments = searchClient.parseArguments(args);
 
-    console.log(commands);
+   console.log(commands);
 
-    const searchResult: ISearchResult = await client.getSearchResults(commands);
-    
-    if (searchResult.status === "ok") {
-        try {            
-            const { stdout, stderr } = await execAsync(`echo '${JSON.stringify(searchResult.data, null, 4)}'`);
+   const searchResult: ISearchResult = await searchClient.getSearchResults(
+      commands
+   );
 
-            console.log(stdout);
+   if (searchResult.status === "ok") {
+      try {
+         await writeFile(
+            "./result.json",
+            JSON.stringify(searchResult.data, null, 4)
+         );
 
-            console.error(stderr);
-        } catch (error) {
-            console.log(error);
-            process.exit(1);
-        }
-    } else {
-        console.log(searchResult.data);
-        process.exit(1);
-    }
+         let shellProcess: ChildProcess = spawn("less", ["./result.json"], {
+            detached: false,
+            stdio: ["ignore", process.stdout, process.stdout],
+         });
+
+         shellProcess.on("exit", async code => {
+            await rmAsync("./result.json");
+            console.log("Exited with code", code);
+            process.exit(0);
+         });
+      } catch (error) {
+         console.log(error);
+         process.exit(1);
+      }
+   } else {
+      console.log(searchResult.data);
+      process.exit(1);
+   }
 }
