@@ -19,30 +19,12 @@ export class CommandHandler {
 
    public async handleCommands(): Promise<void> {
       try {
-         const parsedArguments: IArguments = this.parseArguments(
-            this._commandLineArgs
-         );
-         if (parsedArguments.help) return this.showHelp();
-         else if (parsedArguments.version) return this.showVersion();
-         else return this.showScrapedContent(parsedArguments);
+         if (this._commandLineArgs.help) return this.showHelp();
+         else if (this._commandLineArgs.version) return this.showVersion();
+         else return this.showScrapedContent(this._commandLineArgs);
       } catch (error) {
          throw error;
       }
-   }
-
-   public parseArguments(args: IArguments): IArguments {
-      const commands: IArguments = {
-         _: args._,
-         q: args._.join(" "),
-         hostName: args.h ? args.h : "",
-         hostNameFilterType: args.filterType ? args.filterType : "none",
-         totalPages: args.p ? args.p : 1,
-         videos: args.v ? args.v : false,
-         version: args.version ? args.version : false,
-         help: args.help ? args.help : false,
-      };
-
-      return commands;
    }
 
    public async showVersion(): Promise<void> {

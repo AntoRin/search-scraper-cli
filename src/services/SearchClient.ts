@@ -7,12 +7,22 @@ export class SearchClient {
    public static async getSearchResults(
       args: IArguments
    ): Promise<ISearchResult> {
-      const apiUrl = args.videos ? config.apiYt : config.apiDefault;
+      const apiUrl = args.v ? config.apiYt : config.apiDefault;
+
+      const postBody = {
+         q: args._.join(" "),
+         hostName: args.h ? args.h : "",
+         hostNameFilterType: args.filterType ? args.filterType : "none",
+         totalPages: args.p ? args.p : 1,
+         videos: args.v ? args.v : false,
+         version: args.version ? args.version : false,
+         help: args.help ? args.help : false,
+      };
 
       const responseStream: Response = await fetch(apiUrl, {
          method: "POST",
          headers: { "Content-Type": "application/json" },
-         body: JSON.stringify(args),
+         body: JSON.stringify(postBody),
       });
       const response: ISearchResult = await responseStream.json();
 
