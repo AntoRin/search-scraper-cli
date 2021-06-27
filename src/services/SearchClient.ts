@@ -12,7 +12,7 @@ export class SearchClient {
       const postBody = {
          q: args._.join(" "),
          hostName: args.h ? args.h : "",
-         hostNameFilterType: args.filterType ? args.filterType : "none",
+         hostNameFilterType: args.filterType ? args.filterType : "page",
          totalPages: args.p ? args.p : 1,
          videos: args.v ? args.v : false,
          version: args.version ? args.version : false,
