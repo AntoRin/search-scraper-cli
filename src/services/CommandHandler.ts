@@ -1,14 +1,15 @@
 import child_process, { ChildProcess } from "child_process";
-import { rm, readFile } from "fs";
+import { rm } from "fs";
 import { writeFile } from "fs/promises";
 import { promisify } from "util";
 import { IArguments } from "IArguments";
 import { ISearchResult } from "ISearchResult";
 import { SearchClient } from "./SearchClient";
 
+const { version } = require("../../package.json");
+
 const { spawn } = child_process;
 const rmAsync: Function = promisify(rm);
-const readFileAsync: Function = promisify(readFile);
 
 export class CommandHandler {
    private _commandLineArgs: IArguments;
@@ -28,10 +29,7 @@ export class CommandHandler {
    }
 
    public async showVersion(): Promise<void> {
-      const packageData = JSON.parse(
-         await readFileAsync("./package.json", { encoding: "utf-8" })
-      );
-      console.log(packageData.version);
+      console.log(version);
       process.exit(0);
    }
 
@@ -41,8 +39,6 @@ export class CommandHandler {
    }
 
    public async showScrapedContent(parsedArguments: IArguments): Promise<void> {
-      console.log(parsedArguments);
-
       try {
          const searchResult: ISearchResult =
             await SearchClient.getSearchResults(parsedArguments);

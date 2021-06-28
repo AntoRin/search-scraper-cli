@@ -19,6 +19,8 @@ export class SearchClient {
          help: args.help ? args.help : false,
       };
 
+      console.log(postBody);
+
       const responseStream: Response = await fetch(apiUrl, {
          method: "POST",
          headers: { "Content-Type": "application/json" },
