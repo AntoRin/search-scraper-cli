@@ -45,18 +45,18 @@ export class CommandHandler {
          let printCommand: string;
 
          if (this._platform === "win32") {
-            printCommand = "";
+            printCommand = "more";
          } else {
-            printCommand = "echo";
+            printCommand = "less";
          }
 
-         const process_less: ChildProcess = spawn("less", [], {
+         const process_less: ChildProcess = spawn(printCommand, [], {
             detached: false,
             stdio: ["pipe", process.stdout, process.stderr],
          });
 
          const process_echo: ChildProcess = spawn(
-            `${printCommand}`,
+            `echo`,
             [JSON.stringify(searchResult.data, null, 4)],
             {
                detached: false,
@@ -64,8 +64,13 @@ export class CommandHandler {
             }
          );
 
+         process_echo.on("error", () => {
+            process_less.stdin?.end();
+            process.exit(1);
+         });
          process_echo.on("exit", () => process_less.stdin?.end());
 
+         process_less.on("error", () => process.exit(1));
          process_less.on("exit", code => {
             console.log("Exited with code", code);
             process.exit(0);
