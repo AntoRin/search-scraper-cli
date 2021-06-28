@@ -1,7 +1,4 @@
 import child_process, { ChildProcess } from "child_process";
-import { rm } from "fs";
-import { writeFile } from "fs/promises";
-import { promisify } from "util";
 import { IArguments } from "IArguments";
 import { ISearchResult } from "ISearchResult";
 import { SearchClient } from "./SearchClient";
@@ -9,10 +6,10 @@ import { SearchClient } from "./SearchClient";
 const { version } = require("../../package.json");
 
 const { spawn } = child_process;
-const rmAsync: Function = promisify(rm);
 
 export class CommandHandler {
    private _commandLineArgs: IArguments;
+   private readonly _platform: string = process.platform;
 
    constructor(args: IArguments) {
       this._commandLineArgs = args;
@@ -28,7 +25,7 @@ export class CommandHandler {
       }
    }
 
-   public async showVersion(): Promise<void> {
+   public showVersion(): void {
       console.log(version);
       process.exit(0);
    }
@@ -45,18 +42,31 @@ export class CommandHandler {
 
          if (searchResult.status === "error") throw new Error("Bad request");
 
-         await writeFile(
-            "./result.json",
-            JSON.stringify(searchResult.data, null, 4)
-         );
+         let printCommand: string;
 
-         let shellProcess: ChildProcess = spawn("less", ["./result.json"], {
+         if (this._platform === "win32") {
+            printCommand = "";
+         } else {
+            printCommand = "echo";
+         }
+
+         const process_less: ChildProcess = spawn("less", [], {
             detached: false,
-            stdio: ["ignore", process.stdout, process.stdout],
+            stdio: ["pipe", process.stdout, process.stderr],
          });
 
-         shellProcess.on("exit", async code => {
-            await rmAsync("./result.json");
+         const process_echo: ChildProcess = spawn(
+            `${printCommand}`,
+            [JSON.stringify(searchResult.data, null, 4)],
+            {
+               detached: false,
+               stdio: ["ignore", process_less.stdin, process.stderr],
+            }
+         );
+
+         process_echo.on("exit", () => process_less.stdin?.end());
+
+         process_less.on("exit", code => {
             console.log("Exited with code", code);
             process.exit(0);
          });
