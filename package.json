@@ -1,6 +1,6 @@
 {
    "name": "search-scraper-cli",
-   "version": "1.0.3",
+   "version": "1.0.4",
    "description": "A recursive scraper for your terminal",
    "main": "dist/index.js",
    "bin": {
